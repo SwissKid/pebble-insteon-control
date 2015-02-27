@@ -5,17 +5,20 @@
  */
 
 var UI = require('ui');
+var secrets = require('secrets');
 
 
 
 console.log("Version 0.0.5");
-var API_Key="example_api_key_135fhn80w35hynainrsg0q824hyn";
-var Refresh_Token="example_refresh_241qhn16hwrnga05euynaoeiyhw52";
 var account_authorization;
-var insteon_server = "https://private-anon-a17c67615-insteon.apiary-mock.com";
-
+var API_Key = secrets.API_Key;
+var insteon_server = secrets.insteon_server;
+var Refresh_Token = secrets.Refresh_Token;
 var looped = false;
 var rooms;
+console.log(API_Key);
+console.log(insteon_server);
+console.log(Refresh_Token);
 function jesus_fuck_this(){}
 function display_room_menu(room_menu_list){
   console.log("GONNA DISPLAY NOW");
