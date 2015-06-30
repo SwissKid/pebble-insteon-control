@@ -7,29 +7,9 @@
 var UI = require('ui');
 var Settings = require('settings');
 var secrets = require('secrets');
-console.log("Setting options are:");
-console.log(JSON.stringify(Settings.option()));
-console.log("Setting data is:");
-console.log(JSON.stringify(Settings.data()));
-Settings.config(
-  { url: "http://veryoblivio.us:9001/getkey"
-  },
-  function(e) {
-    console.log('opening configurable');
-
-  },
-  function(e) {
-    console.log('closed configurable');
-    console.log(JSON.stringify(e.options));
-    if (e.failed) {
-      console.log(e.response);
-    }
-    console.log("Setting options are:");
-    console.log(JSON.stringify(Settings.option()));
-    console.log("Setting data is:");
-    console.log(JSON.stringify(Settings.data()));
-  }
-);
+//Gonna try always having quickscreen
+var quickscreen = new UI.Card({});
+var no_config = false;
 
 
 
@@ -63,7 +43,32 @@ function sceneOn(){}
 function sceneOff(){}
 function deviceOn(){}
 function deviceOff(){}
+//Settings
+Settings.config(
+  { url: "http://veryoblivio.us:9001/getkey"
+  },
+  function(e) {
+    console.log('opening configurable');
 
+  },
+  function(e) {
+    console.log('closed configurable');
+    console.log(JSON.stringify(e.options));
+    if (e.failed) {
+      console.log(e.response);
+    }
+    console.log("Setting options are:");
+    console.log(JSON.stringify(Settings.option()));
+    console.log("Setting data is:");
+    console.log(JSON.stringify(Settings.data()));
+    Refresh_Token = Settings.option('Refresh_token');
+    account_authorization= Settings.option('Access_token');
+    if (no_config){
+      quickscreen.hide();
+      main();
+    }
+  }
+);
 //Compare function to sort text lists
 function compare(a,b){
   if (a.title > b.title)
@@ -85,7 +90,6 @@ function populate_all(){
 function display_device_menu(device_list){
   console.log("Submenu");
   console.log(JSON.stringify(device_list));
-  var quickscreen = new UI.Card({});
   var device_menu = new UI.Menu({
     sections: [{
       items: device_list
@@ -124,7 +128,6 @@ function display_device_menu(device_list){
 
 function display_scene_menu(scene_menu_list){
   console.log(JSON.stringify(scene_menu_list));
-  var quickscreen = new UI.Card({});
   var scene_menu = new UI.Menu({
     sections: [{
       items: scene_menu_list
@@ -545,10 +548,10 @@ function sceneOff(sceneID){
 //
 //Refresh everything, then spin up the top menu
 function refresh_card(){
-  var quickscreen = new UI.Card({});
-    quickscreen.title("No configuration found!");
-    quickscreen.body("Please go into the settings for this app and configure it before continuing");
-    quickscreen.show();
+  no_config = true;
+  quickscreen.title("No configuration found!");
+  quickscreen.body("Please go into the settings for this app and configure it before continuing");
+  quickscreen.show();
   quickscreen.on("click", function(e) {
     quickscreen.hide();
     main();
