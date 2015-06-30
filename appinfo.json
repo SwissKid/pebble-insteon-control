@@ -31,6 +31,7 @@
             }
         ]
     },
+    "sdkVersion": "3",
     "shortName": "insteon_control",
     "uuid": "14384808-7d0e-4020-b244-17fa3a82d245",
     "versionCode": 1,
