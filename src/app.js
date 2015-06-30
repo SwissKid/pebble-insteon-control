@@ -5,18 +5,41 @@
  */
 
 var UI = require('ui');
+var Settings = require('settings');
 var secrets = require('secrets');
+console.log("Setting options are:");
+console.log(JSON.stringify(Settings.option()));
+console.log("Setting data is:");
+console.log(JSON.stringify(Settings.data()));
+Settings.config(
+  { url: "http://veryoblivio.us:9001/getkey"
+  },
+  function(e) {
+    console.log('opening configurable');
+
+  },
+  function(e) {
+    console.log('closed configurable');
+    console.log(JSON.stringify(e.options));
+    if (e.failed) {
+      console.log(e.response);
+    }
+    console.log("Setting options are:");
+    console.log(JSON.stringify(Settings.option()));
+    console.log("Setting data is:");
+    console.log(JSON.stringify(Settings.data()));
+  }
+);
 
 
 
-console.log("Version 0.0.5");
+//console.log("Version 0.0.5");
 
 //Variables
 //
 // Rooms/Scenes/Devices are important. 
 // Quick timeout can be changed safely
 // Looped is there since I'm debating making it retry if the bearer token isn't correct
-var account_authorization;
 var looped = false;
 var rooms;
 var scenes;
@@ -29,7 +52,8 @@ var quick_timeout = 800;
 //  settings function in pebblejs.
 var API_Key = secrets.API_Key;
 var insteon_server = secrets.insteon_server;
-var Refresh_Token = secrets.Refresh_Token;
+var Refresh_Token = Settings.option('Refresh_token');
+var account_authorization= Settings.option('Access_token');
 
 //Early declared functions
 //
@@ -361,7 +385,7 @@ function refresh_token(next_request){
       next_request();
     },
     function(error,status,request){
-      console.log('Error! The return was ' + error );
+      console.log('Error! The return was ' + JSON.stringify(error) );
     }
   );
 }
@@ -515,9 +539,29 @@ function sceneOff(sceneID){
   commandEndpoint(commandObj);
   
 }
+//PLEASE CONFIGURE card
 
 //Start Program
 //
 //Refresh everything, then spin up the top menu
-refresh_token(populate_all);
-top_menu_start();
+function refresh_card(){
+  var quickscreen = new UI.Card({});
+    quickscreen.title("No configuration found!");
+    quickscreen.body("Please go into the settings for this app and configure it before continuing");
+    quickscreen.show();
+  quickscreen.on("click", function(e) {
+    quickscreen.hide();
+    main();
+  });
+}
+
+function main() {
+  console.log("Refresh token is :" + Refresh_Token);
+  if (! Refresh_Token)
+    refresh_card();
+  else {
+  refresh_token(populate_all);
+  top_menu_start();
+  }
+}
+main();
